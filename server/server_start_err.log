@@ -1,0 +1,8 @@
+MongoDB connection attempt 1 failed: connect ECONNREFUSED 127.0.0.1:27017
+MongoDB connection attempt 2 failed: connect ECONNREFUSED 127.0.0.1:27017
+MongoDB connection attempt 3 failed: connect ECONNREFUSED 127.0.0.1:27017
+MongoDB connection attempt 4 failed: connect ECONNREFUSED 127.0.0.1:27017
+MongoDB connection attempt 5 failed: connect ECONNREFUSED 127.0.0.1:27017
+MongoDB connection attempt 6 failed: connect ECONNREFUSED 127.0.0.1:27017
+Could not connect to MongoDB after retries. Continuing without DB. Some features may be limited.
+Port 5000 in use, trying 5001...

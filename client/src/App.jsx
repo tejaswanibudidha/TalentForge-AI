@@ -4,6 +4,9 @@ import { Toaster } from 'react-hot-toast';
 import TalentForgeLandingPage from './components/landing/TalentForgeLandingPage';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import VerifyOtp from './pages/auth/VerifyOtp';
+import ResetPassword from './pages/auth/ResetPassword';
 import NotFound from './pages/public/NotFound';
 import Companies from './pages/public/Companies';
 import CompanyDetails from './pages/public/CompanyDetails';
@@ -49,6 +52,9 @@ function AnimatedRoutes() {
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
+        <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+        <Route path="/verify-otp" element={<PageTransition><VerifyOtp /></PageTransition>} />
+        <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/companies" element={<PageTransition><Companies /></PageTransition>} />
         <Route path="/companies/:id" element={<PageTransition><CompanyDetails /></PageTransition>} />
         <Route path="/jobs" element={<PageTransition><Jobs /></PageTransition>} />

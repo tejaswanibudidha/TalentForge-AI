@@ -1,3 +1,5 @@
+import api from './api.js';
+
 const USER_KEY = 'talentforge_current_user';
 const USERS_KEY = 'talentforge_users';
 
@@ -106,4 +108,19 @@ export async function login({ email, password }) {
 
   saveUser(user);
   return user;
+}
+
+export async function forgotPassword(email) {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+}
+
+export async function verifyOtp(email, otp) {
+  const response = await api.post('/auth/verify-otp', { email, otp });
+  return response.data;
+}
+
+export async function resetPassword(email, otp, newPassword) {
+  const response = await api.post('/auth/reset-password', { email, otp, newPassword });
+  return response.data;
 }
