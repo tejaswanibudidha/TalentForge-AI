@@ -190,3 +190,172 @@ export const platformBenefits = {
     "Better matching accuracy",
   ],
 };
+
+export const trendingSkills = [
+  {
+    id: 1,
+    name: "Generative AI Engineering",
+    demand: "86% Demand",
+    emoji: "🤖",
+    description: "Build and deploy AI models for intelligent hiring, recommendation, and automation systems.",
+  },
+  {
+    id: 2,
+    name: "Data Analytics",
+    demand: "79% Demand",
+    emoji: "📊",
+    description: "Analyze candidate pipelines, hiring metrics, and market trends with data-driven precision.",
+  },
+  {
+    id: 3,
+    name: "Cloud Architecture",
+    demand: "74% Demand",
+    emoji: "☁️",
+    description: "Design scalable hiring platforms that support secure recruitment workflows across teams.",
+  },
+  {
+    id: 4,
+    name: "Product Design",
+    demand: "71% Demand",
+    emoji: "🎨",
+    description: "Create intuitive candidate experiences and recruiter dashboards that drive engagement.",
+  },
+];
+
+export const featuredJobs = [
+  {
+    id: "tfj-1",
+    title: "AI Talent Acquisition Lead",
+    company: "NovaHire Labs",
+    type: "Full-time",
+    match: 92,
+    location: "Bengaluru, India",
+    experience: "4-7 years",
+    salary: "₹24 - 32 LPA",
+    skills: ["AI", "Talent Analytics", "Python"],
+    description: "Lead AI-powered talent sourcing and candidate ranking across enterprise hiring initiatives.",
+  },
+  {
+    id: "tfj-2",
+    title: "Product Growth Manager",
+    company: "ForgeWorks",
+    type: "Full-time",
+    match: 88,
+    location: "Remote",
+    experience: "3-5 years",
+    salary: "₹18 - 26 LPA",
+    skills: ["Growth", "SaaS", "User Research"],
+    description: "Own product-led growth opportunities for modern recruiting tools used by startups and scaleups.",
+  },
+  {
+    id: "tfj-3",
+    title: "Recruitment Data Scientist",
+    company: "ScaleStream",
+    type: "Hybrid",
+    match: 90,
+    location: "Mumbai, India",
+    experience: "3-6 years",
+    salary: "₹22 - 30 LPA",
+    skills: ["Machine Learning", "SQL", "Dashboarding"],
+    description: "Use predictive analytics to surface the best-fit candidates and streamline hiring decisions.",
+  },
+  {
+    id: "tfj-4",
+    title: "Candidate Experience Specialist",
+    company: "Talentrix",
+    type: "Full-time",
+    match: 85,
+    location: "Delhi, India",
+    experience: "2-4 years",
+    salary: "₹12 - 18 LPA",
+    skills: ["UX", "Communication", "Hiring"],
+    description: "Design high-touch recruiter and candidate journeys that boost acceptance and retention rates.",
+  },
+];
+
+export const topHiringCompanies = [
+  {
+    id: 1,
+    name: "NovaHire Labs",
+    logo: "🔷",
+    openings: "26",
+    description: "A fast-growing AI talent platform focused on intelligent sourcing and candidate matching.",
+    focus: "AI Recruiting",
+    location: "Bengaluru, India",
+    culture: "Innovative & collaborative",
+  },
+  {
+    id: 2,
+    name: "ScaleStream",
+    logo: "🚀",
+    openings: "18",
+    description: "Scaling recruitment workflows for modern enterprises with intelligent automation.",
+    focus: "Data-driven hiring",
+    location: "Mumbai, India",
+    culture: "Performance-led teams",
+  },
+  {
+    id: 3,
+    name: "ForgeWorks",
+    logo: "⚒️",
+    openings: "14",
+    description: "Building HR SaaS products that connect recruiters, candidates, and hiring operations.",
+    focus: "SaaS Talent Tech",
+    location: "Remote",
+    culture: "Human-first product design",
+  },
+];
+
+export const communityUpdates = [
+  {
+    id: 1,
+    icon: "🔥",
+    category: "Product News",
+    date: "Jun 2026",
+    title: "New AI resume insights with ATS scoring",
+    summary: "TalentForge AI now provides instant resume fit scores and personalized improvement tips for every candidate.",
+  },
+  {
+    id: 2,
+    icon: "💼",
+    category: "Hiring Trends",
+    date: "May 2026",
+    title: "Top skills recruiters want this quarter",
+    summary: "Explore the latest demand signals and make your talent strategy more data-driven.",
+  },
+  {
+    id: 3,
+    icon: "🌟",
+    category: "Success Story",
+    date: "Apr 2026",
+    title: "8,300 placements powered by intelligent matching",
+    summary: "See how our clients increased placement velocity with automated candidate scoring and outreach.",
+  },
+];
+
+export const aiAssistantFeatures = [
+  {
+    id: 1,
+    icon: "ResumeAnalysis",
+    title: "Resume Analysis",
+    description: "Instantly evaluate resumes for strengths, gaps, and employer fit using AI-driven insights.",
+  },
+  {
+    id: 2,
+    icon: "ATSScoring",
+    title: "ATS Scoring",
+    description: "Measure your resume against applicant tracking systems and optimize it for better visibility.",
+  },
+  {
+    id: 3,
+    icon: "JobRecommendations",
+    title: "Job Recommendations",
+    description: "Receive hand-picked opportunities that match your skills, experience, and career goals.",
+  },
+  {
+    id: 4,
+    icon: "SkillGapAnalysis",
+    title: "Skill Gap Analysis",
+    description: "Identify the most valuable skills to learn next and close gaps faster with guided action plans.",
+  },
+];

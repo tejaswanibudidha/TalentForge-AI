@@ -25,6 +25,7 @@ export default function NavbarJobSeeker() {
           <AnimatedLink to="/features">Features</AnimatedLink>
           <AnimatedLink to="/about">About</AnimatedLink>
           {user && <AnimatedLink to="/dashboard">Dashboard</AnimatedLink>}
+          {user && <AnimatedLink to="/career-hub">Career Hub</AnimatedLink>}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">

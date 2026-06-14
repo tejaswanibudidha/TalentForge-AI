@@ -71,10 +71,35 @@ const TFHeroSection = () => {
               matching.
             </motion.p>
 
+            {/* Hero Stats */}
+            <motion.div
+              variants={itemVariants}
+              className="grid grid-cols-2 gap-4 pt-8"
+            >
+              {[
+                { label: "Active Jobs", value: "12,500+" },
+                { label: "Registered Companies", value: "520+" },
+                { label: "Successful Placements", value: "8,300+" },
+                { label: "Active Candidates", value: "14,000+" },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm"
+                >
+                  <p className="text-sm uppercase tracking-[0.35em] text-slate-500 font-semibold">
+                    {stat.label}
+                  </p>
+                  <p className="text-3xl font-bold text-slate-900 mt-3">
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+
             {/* CTA Buttons */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-4 pt-4"
+              className="flex flex-col sm:flex-row gap-4 pt-6"
             >
                 <motion.div
                 {...hoverScale}

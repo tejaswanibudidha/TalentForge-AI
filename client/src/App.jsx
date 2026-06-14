@@ -27,6 +27,7 @@ import RecruiterFeatures from './pages/recruiter/CompanyFeatures';
 import JobDetails from './pages/JobDetails';
 import Apply from './pages/public/Apply';
 import JobseekerDashboard from './pages/jobseeker/Dashboard';
+import CareerHub from './pages/jobseeker/CareerHub';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/Settings';
 import ContactRequests from './pages/admin/ContactRequests';
@@ -54,6 +55,7 @@ function AnimatedRoutes() {
         <Route path="/profile/setup" element={<ProtectedRoute><PageTransition><ProfileSetup /></PageTransition></ProtectedRoute>} />
         <Route path="/company/setup" element={<ProtectedRoute><PageTransition><CompanySetup /></PageTransition></ProtectedRoute>} />
         <Route path="/dashboard" element={<JobSeekerRoute><PageTransition><JobseekerDashboard /></PageTransition></JobSeekerRoute>} />
+        <Route path="/career-hub" element={<JobSeekerRoute><PageTransition><CareerHub /></PageTransition></JobSeekerRoute>} />
         <Route path="/recruiter/dashboard" element={<RecruiterRoute><PageTransition><RecruiterDashboard /></PageTransition></RecruiterRoute>} />
         <Route path="/recruiter/company" element={<RecruiterRoute><PageTransition><RecruiterCompany /></PageTransition></RecruiterRoute>} />
         <Route path="/recruiter/jobs" element={<RecruiterRoute><PageTransition><RecruiterJobPostings /></PageTransition></RecruiterRoute>} />

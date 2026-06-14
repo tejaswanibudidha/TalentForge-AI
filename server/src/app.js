@@ -8,7 +8,7 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import './config/db.js';
+// Note: DB connection is handled in server.js via connectDB()
 
 const app = express();
 
