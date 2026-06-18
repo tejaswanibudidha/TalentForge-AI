@@ -3,6 +3,7 @@ import * as jobService from '../services/jobService';
 import * as companyService from '../services/companyService';
 import * as postService from '../services/postService';
 import * as contactService from '../services/contactService';
+import api from '../services/api';
 
 const DataContext = createContext(null);
 
@@ -32,21 +33,25 @@ export function DataProvider({ children }) {
     return created;
   };
 
-  const applyJob = (jobId, application) => {
+  const applyJob = async (jobId, application) => {
+    // Send application to backend API; do not fallback to localStorage here.
     try {
-      // Attempt to POST to backend if API available
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (apiUrl) {
-        // eslint-disable-next-line no-console
-        console.log('DataContext: backend API detected, use API for apply (frontend will still fallback).');
+      const payload = {
+        jobId,
+        resumeUrl: application.resumeNameData || application.resume || application.resumeUrl,
+        coverLetter: application.q_why || application.coverLetter || application.cover_letter,
+      };
+      const res = await api.post('/applications', payload);
+      // Optionally refresh local jobs after successful submission
+      try {
+        setJobs(jobService.getJobs());
+      } catch (e) {
+        // ignore
       }
-      jobService.applyJob(jobId, application);
-      // refresh local state
-      setJobs(jobService.getJobs());
-      return true;
+      return res.data;
     } catch (err) {
-      console.error(err);
-      return false;
+      console.error('DataContext.applyJob API error:', err?.response?.data || err.message || err);
+      throw err;
     }
   };
 

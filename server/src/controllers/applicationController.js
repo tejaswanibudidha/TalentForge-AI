@@ -1,5 +1,6 @@
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
+import { uploadBuffer } from '../services/cloudinaryService.js';
 
 function formatError(message) {
   return { success: false, message };
@@ -12,6 +13,20 @@ function formatSuccess(message, data = {}) {
 export async function createApplication(req, res, next) {
   try {
     const { jobId, resumeUrl, coverLetter } = req.body;
+    console.log('Incoming POST /api/applications', { body: req.body, hasFile: Boolean(req.file), user: req.user && { id: req.user.id, email: req.user.email } });
+
+    // if a file was uploaded via multipart/form-data, upload to Cloudinary and set resumeUrl
+    let resumeLink = resumeUrl;
+    if (req.file && req.file.buffer) {
+      try {
+        const uploaded = await uploadBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
+        resumeLink = uploaded.secure_url || uploaded.url;
+        console.log('Uploaded resume to Cloudinary:', resumeLink);
+      } catch (uploadErr) {
+        console.error('Cloudinary upload failed:', uploadErr);
+        return res.status(500).json({ success: false, message: 'Failed to upload resume.' });
+      }
+    }
 
     const job = await Job.findById(jobId);
     if (!job) {
@@ -26,24 +41,27 @@ export async function createApplication(req, res, next) {
     const application = await Application.create({
       jobId,
       candidateId: req.user.id,
-      resumeUrl: String(resumeUrl).trim(),
+      recruiterId: job.recruiterId || null,
+      resumeUrl: String(resumeLink || '').trim(),
       coverLetter: coverLetter ? String(coverLetter).trim() : undefined,
       status: 'Applied',
     });
-
+    console.log('Created application id:', application._id);
     res.status(201).json(formatSuccess('Application submitted successfully.', { application }));
   } catch (error) {
+    console.error('Error in createApplication:', error);
     next(error);
   }
 }
 
 export async function getApplications(req, res, next) {
   try {
-    const { jobId, candidateId, status, page = 1, limit = 20, sortBy, sortOrder } = req.query;
+    const { jobId, candidateId, recruiterId, status, page = 1, limit = 20, sortBy, sortOrder } = req.query;
 
     const query = {};
     if (jobId) query.jobId = jobId;
     if (candidateId) query.candidateId = candidateId;
+    if (recruiterId) query.recruiterId = recruiterId;
     if (status) query.status = String(status).trim();
 
     const sortKey = sortBy ? String(sortBy).trim() : 'appliedAt';

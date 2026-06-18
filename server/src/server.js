@@ -26,6 +26,7 @@ const PORT = process.env.PORT || 5000;
   };
 
   try {
+    console.log('Loading environment and connecting to database...');
     const connected = await connectDB();
     if (connected || process.env.NODE_ENV === 'development') {
       startServer(PORT);

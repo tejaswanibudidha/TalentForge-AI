@@ -25,7 +25,7 @@ function bufferToStream(buffer) {
   return Readable.from(buffer);
 }
 
-export async function uploadBufferToCloudinary(buffer, options = {}) {
+export async function uploadBuffer(buffer, options = {}) {
   ensureCloudinaryConfig();
 
   const { publicId, folder, resourceType = 'auto' } = options;
@@ -33,18 +33,15 @@ export async function uploadBufferToCloudinary(buffer, options = {}) {
     folder,
     resource_type: resourceType,
     public_id: publicId,
-    overwrite: true,
+    overwrite: false,
     secure: true,
   };
 
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
-      if (error) {
-        return reject(error);
-      }
+      if (error) return reject(error);
       resolve(result);
     });
-
     bufferToStream(buffer).pipe(uploadStream);
   });
 }

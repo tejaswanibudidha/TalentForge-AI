@@ -1,6 +1,6 @@
 import Resume from '../models/Resume.js';
 import UserProfile from '../models/UserProfile.js';
-import { uploadBufferToCloudinary } from '../services/cloudinaryService.js';
+import { uploadBuffer } from '../services/cloudinaryService.js';
 
 function formatError(message) {
   return { success: false, message };
@@ -17,7 +17,7 @@ export async function uploadResume(req, res, next) {
     }
 
     const publicId = `talentforge/resumes/${req.user.id}-${Date.now()}`;
-    const result = await uploadBufferToCloudinary(req.file.buffer, {
+    const result = await uploadBuffer(req.file.buffer, {
       folder: 'talentforge/resumes',
       publicId,
       resourceType: 'raw',
@@ -44,7 +44,7 @@ export async function uploadProfileImage(req, res, next) {
     }
 
     const publicId = `talentforge/profile-images/${req.user.id}-${Date.now()}`;
-    const result = await uploadBufferToCloudinary(req.file.buffer, {
+    const result = await uploadBuffer(req.file.buffer, {
       folder: 'talentforge/profile-images',
       publicId,
       resourceType: 'image',

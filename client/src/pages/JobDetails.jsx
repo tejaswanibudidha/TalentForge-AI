@@ -12,23 +12,27 @@ export default function JobDetails() {
   const [form, setForm] = useState({ skills: '', education: '', resume: '' });
   const [applied, setApplied] = useState(false);
 
-  const handleApply = (event) => {
+  const handleApply = async (event) => {
     event.preventDefault();
     if (!user || user.role !== 'jobseeker') {
       alert('Please sign in as a job seeker to apply for this role.');
       return;
     }
 
-    applyJob(id, {
-      name: user.fullName || user.email,
-      resume: form.resume,
-      skills: form.skills,
-      education: form.education,
-      atsScore: Math.min(100, Math.max(55, (form.skills.split(',').filter(Boolean).length * 12) + 50)),
-      status: 'Applied'
-    });
-    setApplied(true);
-    alert('Application submitted successfully.');
+    const payload = {
+      jobId: id,
+      resumeUrl: form.resume,
+      coverLetter: '',
+    };
+
+    try {
+      await applyJob(id, payload);
+      setApplied(true);
+      alert('Application submitted successfully.');
+    } catch (err) {
+      console.error('Apply failed:', err?.response?.data || err.message || err);
+      alert(`Failed to submit application: ${err?.response?.data?.message || err.message || 'Server error'}`);
+    }
   };
 
   if (!job) return <div className="p-6">Job not found</div>;

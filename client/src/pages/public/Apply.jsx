@@ -73,11 +73,8 @@ export default function Apply() {
   const handleFile = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setForm((f) => ({ ...f, [fieldName]: file.name, [`${fieldName}Data`]: reader.result }));
-    };
-    reader.readAsDataURL(file);
+    // keep the File object in state and store filename
+    setForm((f) => ({ ...f, [fieldName]: file.name, [`${fieldName}File`]: file }));
   };
 
   const saveDraft = () => {
@@ -92,7 +89,7 @@ export default function Apply() {
     if (!form.name || !form.email || !form.phone) return 'Name, email and phone are required';
     // basic email check
     if (!/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(form.email)) return 'Enter a valid email address';
-    if (!form.resumeNameData && !form.resumeName) return 'Please upload or attach your resume';
+    if (!form.resumeNameFile && !form.resumeName) return 'Please upload or attach your resume';
     return null;
   };
 
@@ -116,36 +113,38 @@ export default function Apply() {
       appliedAt: new Date().toISOString(),
     };
 
-    // Try backend if API available and user appears authenticated
-    const canCallApi = Boolean(import.meta.env.VITE_API_URL && user?.token);
-    if (canCallApi) {
-      try {
-        await api.post('/applications', { jobId: application.jobId, resumeUrl: application.resumeNameData || application.resumeName, coverLetter: application.q_why }, { headers: { Authorization: `Bearer ${user.token}` } });
-        toast.success('Application submitted successfully');
-        setLoading(false);
-        navigate('/dashboard');
-        return;
-      } catch (err) {
-        // fallback to local storage if API fails
-        console.error('API apply failed, falling back to local', err);
-        toast.error('Could not submit to server, saving locally');
-      }
+    // Require backend submission; do not fallback to localStorage.
+    if (!import.meta.env.VITE_API_URL) {
+      toast.error('Server API not configured. Please contact the administrator.');
+      setLoading(false);
+      return;
     }
 
-    // Local fallback
-    try {
-      const success = applyJob(jobId, application);
-      if (success) {
-        toast.success('Application saved locally');
-        navigate('/dashboard');
-      } else {
-        toast.error('Failed to save application');
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to submit application');
-    } finally {
+    if (!user?.token) {
+      toast.error('Please sign in to submit your application.');
       setLoading(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('jobId', application.jobId);
+      formData.append('coverLetter', application.q_why || '');
+      if (form.resumeNameFile) formData.append('resume', form.resumeNameFile, form.resumeName);
+      // append other metadata as JSON string
+      formData.append('metadata', JSON.stringify({ name: form.name, email: form.email, phone: form.phone }));
+
+      await api.post('/applications', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      toast.success('Application submitted successfully');
+      setLoading(false);
+      navigate('/dashboard');
+      return;
+    } catch (err) {
+      console.error('Application POST failed:', err?.response?.data || err.message || err);
+      const message = err?.response?.data?.message || err.message || 'Server error';
+      toast.error(`Failed to submit application: ${message}`);
+      setLoading(false);
+      return;
     }
   };
 
