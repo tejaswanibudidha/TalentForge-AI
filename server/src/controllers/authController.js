@@ -23,11 +23,11 @@ function formatSuccess(message, data = {}) {
 
 export async function registerUser(req, res, next) {
   try {
-    const name = (req.body.name || req.body.fullName || '').trim();
+    const fullName = (req.body.fullName || req.body.name || '').trim();
     const { email, password, role } = req.body;
 
-    if (!name) {
-      return res.status(400).json(formatError('Name is required.'));
+    if (!fullName) {
+      return res.status(400).json(formatError('Full name is required.'));
     }
 
     if (!email || !isValidEmail(email)) {
@@ -50,7 +50,7 @@ export async function registerUser(req, res, next) {
 
     const hashedPassword = await hashPassword(password);
     const user = await User.create({
-      name,
+      fullName,
       email: normalizedEmail,
       password: hashedPassword,
       role,
@@ -117,12 +117,12 @@ export async function forgotPassword(req, res, next) {
     const hashedOtp = await hashPassword(otp);
     const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRES_MINUTES || 10) * 60 * 1000);
 
-    user.resetOTP = hashedOtp;
+    user.otp = hashedOtp;
     user.otpExpiry = expires;
     user.otpVerified = false;
     await user.save();
 
-    await sendResetOtp(user.email, otp, user.name);
+    await sendResetOtp(user.email, otp, user.fullName);
 
     res.json(formatSuccess('If that email is registered, a password reset OTP has been sent.'));
   } catch (error) {
@@ -143,8 +143,8 @@ export async function verifyOtp(req, res, next) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail }).select('+resetOTP +otpExpiry +otpVerified');
-    if (!user || !user.resetOTP || !user.otpExpiry) {
+    const user = await User.findOne({ email: normalizedEmail }).select('+otp +otpExpiry +otpVerified');
+    if (!user || !user.otp || !user.otpExpiry) {
       return res.status(400).json(formatError('Invalid or expired OTP.'));
     }
 
@@ -152,7 +152,7 @@ export async function verifyOtp(req, res, next) {
       return res.status(400).json(formatError('OTP has expired. Please request a new one.'));
     }
 
-    const otpMatches = await bcrypt.compare(otp, user.resetOTP);
+    const otpMatches = await bcrypt.compare(otp, user.otp);
     if (!otpMatches) {
       return res.status(400).json(formatError('Invalid OTP.'));
     }
@@ -183,8 +183,8 @@ export async function resetPassword(req, res, next) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail }).select('+password +resetOTP +otpExpiry');
-    if (!user || !user.resetOTP || !user.otpExpiry) {
+    const user = await User.findOne({ email: normalizedEmail }).select('+password +otp +otpExpiry');
+    if (!user || !user.otp || !user.otpExpiry) {
       return res.status(400).json(formatError('OTP verification is required before resetting your password.'));
     }
 
@@ -192,13 +192,13 @@ export async function resetPassword(req, res, next) {
       return res.status(400).json(formatError('OTP has expired. Please request a new one.'));
     }
 
-    const otpMatches = await bcrypt.compare(otp, user.resetOTP);
+    const otpMatches = await bcrypt.compare(otp, user.otp);
     if (!otpMatches) {
       return res.status(400).json(formatError('Invalid OTP.'));
     }
 
     user.password = await hashPassword(newPassword);
-    user.resetOTP = undefined;
+    user.otp = undefined;
     user.otpExpiry = undefined;
     user.otpVerified = false;
     await user.save();

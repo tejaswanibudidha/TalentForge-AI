@@ -26,10 +26,19 @@ const PORT = process.env.PORT || 5000;
   };
 
   try {
-    await connectDB();
-    startServer(PORT);
+    const connected = await connectDB();
+    if (connected || process.env.NODE_ENV === 'development') {
+      startServer(PORT);
+    } else {
+      throw new Error('MongoDB connection required in production.');
+    }
   } catch (err) {
-    console.error('Failed to start server because MongoDB is not connected:', err);
-    process.exit(1);
+    console.error('Failed to start server:', err.message);
+    if (process.env.NODE_ENV !== 'development') {
+      process.exit(1);
+    } else {
+      console.log('Starting in demo mode...');
+      startServer(PORT);
+    }
   }
 })();

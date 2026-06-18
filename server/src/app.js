@@ -8,7 +8,18 @@ import authRoutes from './routes/authRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import atsRoutes from './routes/atsRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
+import recruiterRoutes from './routes/recruiterRoutes.js';
+import interviewRoutes from './routes/interviewRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 // Note: DB connection is handled in server.js via connectDB()
 
@@ -37,9 +48,20 @@ app.use(morgan('dev'));
 app.use(globalLimiter);
 
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/resumes', resumeRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/company', companyRoutes);
+app.use('/api/ats', atsRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/recruiter', recruiterRoutes);
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {

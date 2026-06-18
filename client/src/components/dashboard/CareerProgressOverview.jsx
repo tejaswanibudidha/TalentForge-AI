@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "../../utils/animations";
 import { FileText, CheckCircle2, Calendar, Gift, TrendingUp } from "lucide-react";
+import api from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
-const CareerProgressCard = ({ icon: Icon, label, value, trend, color }) => (
+const CareerProgressCard = ({ icon: Icon, label, value, trend, color, loading }) => (
   <motion.div
     variants={itemVariants}
     whileHover={{ y: -8 }}
@@ -22,17 +24,59 @@ const CareerProgressCard = ({ icon: Icon, label, value, trend, color }) => (
     <p className="text-sm uppercase tracking-[0.35em] text-slate-600 font-semibold mb-2">
       {label}
     </p>
-    <p className="text-5xl font-bold text-slate-900">{value}</p>
+    <p className="text-5xl font-bold text-slate-900">
+      {loading ? "..." : value}
+    </p>
   </motion.div>
 );
 
 const CareerProgressOverview = () => {
-  const [userData] = useState({
-    applicationsSubmitted: 24,
-    shortlistedJobs: 8,
-    interviewsScheduled: 3,
-    offersReceived: 1,
+  const { user } = useAuth();
+  const [userData, setUserData] = useState({
+    applicationsSubmitted: 0,
+    shortlistedJobs: 0,
+    interviewsScheduled: 0,
+    offersReceived: 0,
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboardStats() {
+      if (!user?.token) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await api.get('/dashboard/jobseeker', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+
+        if (response?.data?.success && response.data.data) {
+          const {
+            applicationsSubmitted = 0,
+            shortlistedJobs = 0,
+            interviewsScheduled = 0,
+            offersReceived = 0,
+          } = response.data.data;
+
+          setUserData({
+            applicationsSubmitted,
+            shortlistedJobs,
+            interviewsScheduled,
+            offersReceived,
+          });
+        }
+      } catch (error) {
+        console.error('Error loading career progress stats', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardStats();
+  }, [user?.token]);
 
   const cards = [
     {
@@ -83,7 +127,7 @@ const CareerProgressOverview = () => {
 
       <div className="grid gap-6 lg:grid-cols-4">
         {cards.map((card) => (
-          <CareerProgressCard key={card.label} {...card} />
+          <CareerProgressCard key={card.label} loading={loading} {...card} />
         ))}
       </div>
     </motion.div>

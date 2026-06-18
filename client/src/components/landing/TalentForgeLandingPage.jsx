@@ -3,10 +3,7 @@ import { motion } from "framer-motion";
 import TFNavbar from "./TFNavbar";
 import TFHeroSection from "./TFHeroSection";
 import TFTrendingSkills from "./TFTrendingSkills";
-import TFFeaturedJobs from "./TFFeaturedJobs";
-import TFTopHiringCompanies from "./TFTopHiringCompanies";
 import TFAICareerAssistant from "./TFAICareerAssistant";
-import TFCommunityUpdates from "./TFCommunityUpdates";
 import TFTrustedCompanies from "./TFTrustedCompanies";
 import TFFeatures from "./TFFeatures";
 import TFHowItWorks from "./TFHowItWorks";
@@ -33,17 +30,8 @@ const TalentForgeLandingPage = () => {
       {/* Trending Skills */}
       <TFTrendingSkills />
 
-      {/* Featured Jobs */}
-      <TFFeaturedJobs />
-
-      {/* Top Hiring Companies */}
-      <TFTopHiringCompanies />
-
       {/* AI Career Assistant */}
       <TFAICareerAssistant />
-
-      {/* Community Updates */}
-      <TFCommunityUpdates />
 
       {/* Trusted Companies */}
       <TFTrustedCompanies />

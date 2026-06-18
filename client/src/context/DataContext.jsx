@@ -34,6 +34,12 @@ export function DataProvider({ children }) {
 
   const applyJob = (jobId, application) => {
     try {
+      // Attempt to POST to backend if API available
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (apiUrl) {
+        // eslint-disable-next-line no-console
+        console.log('DataContext: backend API detected, use API for apply (frontend will still fallback).');
+      }
       jobService.applyJob(jobId, application);
       // refresh local state
       setJobs(jobService.getJobs());

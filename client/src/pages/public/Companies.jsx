@@ -1,30 +1,58 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
 import { useData } from "../../context/DataContext";
+import api from "../../services/api";
 import { containerVariants, itemVariants } from "../../utils/animations";
 import CompanyFilters from "../../components/companies/CompanyFilters";
 import CompanyCardProfessional from "../../components/companies/CompanyCardProfessional";
-import RecommendedCompanies from "../../components/companies/RecommendedCompanies";
 import { Search, Layout, LayoutGrid } from "lucide-react";
 
 export default function Companies() {
   const { companies, jobs } = useData();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [availableCompanies, setAvailableCompanies] = useState(companies);
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({});
   const [savedCompanies, setSavedCompanies] = useState({});
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
 
+  useEffect(() => {
+    const isApiConfigured = Boolean(import.meta.env.VITE_API_URL);
+
+    async function loadCompanies() {
+      if (isApiConfigured) {
+        try {
+          const response = await api.get('/companies');
+          const fetchedCompanies = response?.data?.success ? response.data.data.companies : null;
+          if (Array.isArray(fetchedCompanies)) {
+            setAvailableCompanies(isAuthenticated ? fetchedCompanies : fetchedCompanies.slice(0, 5));
+            return;
+          }
+        } catch (error) {
+          // Fallback to local data below
+        }
+      }
+
+      setAvailableCompanies(isAuthenticated ? companies : companies.slice(0, 5));
+    }
+
+    loadCompanies();
+  }, [companies, isAuthenticated]);
+
   // Enrich companies with job counts
   const allCompanies = useMemo(() => {
-    return companies.map((company) => ({
+    return availableCompanies.map((company) => ({
       ...company,
       openJobs: jobs.filter(
         (job) =>
           job.companyId === company.id || job.company === company.companyName || job.company === company.name
       ).length,
     }));
-  }, [companies, jobs]);
+  }, [availableCompanies, jobs]);
 
   const filteredCompanies = useMemo(() => {
     return allCompanies.filter((company) => {
@@ -225,10 +253,25 @@ export default function Companies() {
             </motion.div>
 
             {/* Company Listings */}
+            {!isAuthenticated && (
+              <motion.div variants={itemVariants} className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center">
+                <p className="text-lg font-semibold text-slate-900">
+                  Login to explore all hiring companies and job opportunities.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="mt-4 inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                >
+                  Login
+                </button>
+              </motion.div>
+            )}
+
             {filteredCompanies.length > 0 ? (
               <motion.div
                 variants={containerVariants}
-                className={`grid gap-6 ${
+                className={`relative grid gap-6 ${
                   viewMode === "grid"
                     ? "lg:grid-cols-2"
                     : "grid-cols-1"
@@ -247,6 +290,19 @@ export default function Companies() {
                     />
                   </motion.div>
                 ))}
+
+                {!isAuthenticated && filteredCompanies.length >= 6 && (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 rounded-[2rem] bg-white/90 backdrop-blur-sm border-t border-slate-200 flex items-center justify-center px-6">
+                    <div className="text-center">
+                      <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
+                        Login to unlock all companies.
+                      </p>
+                      <p className="mt-2 text-base text-slate-700">
+                        Unlock the full hiring network and discover more opportunities.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ) : (
               <motion.div
@@ -273,13 +329,6 @@ export default function Companies() {
               </motion.div>
             )}
 
-            {/* Recommended Companies Section */}
-            {filteredCompanies.length > 0 && (
-              <RecommendedCompanies
-                companies={filteredCompanies.slice(0, 8)}
-                jobs={jobs}
-              />
-            )}
           </motion.div>
         </motion.div>
       </div>

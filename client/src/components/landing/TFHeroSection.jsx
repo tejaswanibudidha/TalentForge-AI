@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -8,9 +8,67 @@ import {
   hoverScale,
 } from "../../utils/animations";
 import { ArrowRight, PlayCircle } from "lucide-react";
+import dashboardService from "../../services/dashboardService";
 
 const TFHeroSection = () => {
   const [isHovering, setIsHovering] = useState(false);
+  const [summary, setSummary] = useState({
+    atsScore: 0,
+    matchScore: 0,
+    totalCandidates: 0,
+    pipelineCount: 0,
+  });
+  const [topCandidates, setTopCandidates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSummary() {
+      try {
+        const data = await dashboardService.getPublicDashboardSummary();
+        setSummary({
+          atsScore: data.atsScore ?? 0,
+          matchScore: data.matchScore ?? 0,
+          totalCandidates: data.totalCandidates ?? 0,
+          pipelineCount: data.pipelineCount ?? 0,
+        });
+        setTopCandidates(data.topCandidates || []);
+      } catch (error) {
+        setSummary({
+          atsScore: 0,
+          matchScore: 0,
+          totalCandidates: 0,
+          pipelineCount: 0,
+        });
+        setTopCandidates([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSummary();
+  }, []);
+
+  const stats = [
+    { label: "ATS Score", value: loading ? "--" : `${summary.atsScore}%`, icon: "⚡" },
+    { label: "Match Score", value: loading ? "--" : `${summary.matchScore}%`, icon: "🎯" },
+    { label: "Candidates", value: loading ? "--" : summary.totalCandidates.toLocaleString(), icon: "👥" },
+    { label: "Pipeline", value: loading ? "--" : summary.pipelineCount.toLocaleString(), icon: "📊" },
+  ];
+
+  const candidates = loading
+    ? [
+        { name: "Loading...", score: 0 },
+        { name: "Loading...", score: 0 },
+        { name: "Loading...", score: 0 },
+      ]
+    : topCandidates.length > 0
+    ? topCandidates.map((candidate) => ({
+        name: candidate.candidateName || 'Candidate',
+        score: candidate.atsScore || candidate.matchScore || 0,
+      }))
+    : [
+        { name: "No candidate data", score: 0 },
+      ];
 
   return (
     <div
@@ -70,31 +128,6 @@ const TFHeroSection = () => {
               resume analysis, ATS scoring, candidate ranking, and smart job
               matching.
             </motion.p>
-
-            {/* Hero Stats */}
-            <motion.div
-              variants={itemVariants}
-              className="grid grid-cols-2 gap-4 pt-8"
-            >
-              {[
-                { label: "Active Jobs", value: "12,500+" },
-                { label: "Registered Companies", value: "520+" },
-                { label: "Successful Placements", value: "8,300+" },
-                { label: "Active Candidates", value: "14,000+" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm"
-                >
-                  <p className="text-sm uppercase tracking-[0.35em] text-slate-500 font-semibold">
-                    {stat.label}
-                  </p>
-                  <p className="text-3xl font-bold text-slate-900 mt-3">
-                    {stat.value}
-                  </p>
-                </div>
-              ))}
-            </motion.div>
 
             {/* CTA Buttons */}
             <motion.div
@@ -163,17 +196,13 @@ const TFHeroSection = () => {
 
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { label: "ATS Score", value: "92%", icon: "⚡" },
-                      { label: "Match Score", value: "89%", icon: "🎯" },
-                      { label: "Candidates", value: "245", icon: "👥" },
-                      { label: "Pipeline", value: "45", icon: "📊" },
-                    ].map((stat, idx) => (
+                    {stats.map((stat, idx) => (
                       <motion.div
                         key={idx}
                         animate={{
                           scale: isHovering ? 1.05 : 1,
                         }}
+                        transition={{ duration: 0.2 }}
                         className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100/50"
                       >
                         <div className="text-sm text-slate-600 mb-2">
@@ -194,13 +223,9 @@ const TFHeroSection = () => {
                     <div className="text-sm font-semibold text-slate-700 mb-3">
                       Top Candidates
                     </div>
-                    {[
-                      { name: "Alex Johnson", score: 95 },
-                      { name: "Sarah Chen", score: 92 },
-                      { name: "Mike Williams", score: 88 },
-                    ].map((candidate, idx) => (
+                    {candidates.map((candidate, idx) => (
                       <div
-                        key={idx}
+                        key={`${candidate.name}-${idx}`}
                         className="flex items-center justify-between text-sm"
                       >
                         <span className="text-slate-700">{candidate.name}</span>
@@ -209,9 +234,9 @@ const TFHeroSection = () => {
                             initial={{ width: 0 }}
                             animate={{ width: `${candidate.score}%` }}
                             transition={{
-                              duration: 1.5,
+                              duration: 1.2,
                               ease: "easeOut",
-                              delay: idx * 0.2,
+                              delay: idx * 0.15,
                             }}
                             className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
                           />
@@ -238,7 +263,9 @@ const TFHeroSection = () => {
                 <div className="text-xs font-semibold text-indigo-600 mb-1">
                   Resume Analysis
                 </div>
-                <div className="text-2xl font-bold text-slate-900">92%</div>
+                <div className="text-2xl font-bold text-slate-900">
+                  {loading ? '--' : `${summary.atsScore}%`}
+                </div>
               </motion.div>
 
               <motion.div
@@ -257,7 +284,9 @@ const TFHeroSection = () => {
                 <div className="text-xs font-semibold text-purple-600 mb-1">
                   Skill Match
                 </div>
-                <div className="text-2xl font-bold text-slate-900">89%</div>
+                <div className="text-2xl font-bold text-slate-900">
+                  {loading ? '--' : `${summary.matchScore}%`}
+                </div>
               </motion.div>
             </motion.div>
           </motion.div>

@@ -10,11 +10,11 @@ const TFNavbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { name: "Home", href: "#home" },
-    { name: "Jobs", href: "#jobs" },
-    { name: "Companies", href: "#companies" },
-    { name: "Features", href: "#features" },
-    { name: "About", href: "#about" },
+    { name: "Home", to: "/" },
+    { name: "Jobs", to: "/jobs" },
+    { name: "Companies", to: "/companies" },
+    { name: "Features", to: "/features" },
+    { name: "About", to: "/about" },
   ];
 
   const handleGetStarted = () => {
@@ -49,14 +49,13 @@ const TFNavbar = () => {
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <motion.a
+              <Link
                 key={link.name}
-                href={link.href}
-                whileHover={{ y: -2 }}
+                to={link.to}
                 className="text-slate-700 hover:text-indigo-600 font-medium text-sm transition-colors"
               >
                 {link.name}
-              </motion.a>
+              </Link>
             ))}
           </div>
 
@@ -115,13 +114,16 @@ const TFNavbar = () => {
           >
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
+                <button
                   key={link.name}
-                  href={link.href}
-                  className="text-slate-700 font-medium hover:text-indigo-600 transition-colors px-4"
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate(link.to);
+                  }}
+                  className="text-slate-700 font-medium hover:text-indigo-600 transition-colors text-left px-4"
                 >
                   {link.name}
-                </a>
+                </button>
               ))}
               <div className="flex gap-3 px-4 pt-4 border-t border-slate-200/30">
                 {user ? (

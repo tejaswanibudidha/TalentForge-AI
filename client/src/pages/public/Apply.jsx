@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import AnimatedCard from '../../components/ui/AnimatedCard';
 import AnimatedButton from '../../components/ui/AnimatedButton';
+import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 export default function Apply() {
   const { id: jobId } = useParams();
@@ -47,6 +49,21 @@ export default function Apply() {
     willingRelocate: 'No',
     declaration: false,
   });
+  const [loading, setLoading] = useState(false);
+
+  const { jobs } = useData();
+  const job = jobs.find((j) => j.id === jobId) || {};
+
+  useEffect(() => {
+    // Prefill from user profile where available
+    setForm((f) => ({
+      ...f,
+      name: user?.fullName || user?.fullName || f.name,
+      email: user?.email || f.email,
+      phone: user?.profile?.mobile || user?.profile?.phone || f.phone,
+      skills: Array.isArray(user?.profile?.skills) ? (user.profile.skills || []).join(', ') : f.skills,
+    }));
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -70,15 +87,65 @@ export default function Apply() {
     alert('Saved as draft');
   };
 
-  const submit = (e) => {
+  const validate = () => {
+    if (!form.declaration) return 'Please confirm the declaration';
+    if (!form.name || !form.email || !form.phone) return 'Name, email and phone are required';
+    // basic email check
+    if (!/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(form.email)) return 'Enter a valid email address';
+    if (!form.resumeNameData && !form.resumeName) return 'Please upload or attach your resume';
+    return null;
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    if (!form.declaration) return alert('Please confirm the declaration');
-    const application = { ...form, status: 'Applied', date: new Date().toISOString() };
-    const success = applyJob(jobId, application);
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      alert('Failed to submit application');
+    const err = validate();
+    if (err) return toast.error(err);
+
+    setLoading(true);
+
+    const application = {
+      jobId,
+      jobTitle: job.title || '',
+      companyId: job.companyId || job.company || '',
+      companyName: job.company || '',
+      location: job.location || '',
+      salary: job.salary || '',
+      experience: job.experience || '',
+      ...form,
+      status: 'Applied',
+      appliedAt: new Date().toISOString(),
+    };
+
+    // Try backend if API available and user appears authenticated
+    const canCallApi = Boolean(import.meta.env.VITE_API_URL && user?.token);
+    if (canCallApi) {
+      try {
+        await api.post('/applications', { jobId: application.jobId, resumeUrl: application.resumeNameData || application.resumeName, coverLetter: application.q_why }, { headers: { Authorization: `Bearer ${user.token}` } });
+        toast.success('Application submitted successfully');
+        setLoading(false);
+        navigate('/dashboard');
+        return;
+      } catch (err) {
+        // fallback to local storage if API fails
+        console.error('API apply failed, falling back to local', err);
+        toast.error('Could not submit to server, saving locally');
+      }
+    }
+
+    // Local fallback
+    try {
+      const success = applyJob(jobId, application);
+      if (success) {
+        toast.success('Application saved locally');
+        navigate('/dashboard');
+      } else {
+        toast.error('Failed to save application');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to submit application');
+    } finally {
+      setLoading(false);
     }
   };
 

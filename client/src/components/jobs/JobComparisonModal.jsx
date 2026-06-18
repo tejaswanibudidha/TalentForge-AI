@@ -125,6 +125,7 @@ const JobComparisonModal = ({ isOpen, jobs = [], onClose }) => {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          onClick={() => window.location.assign(`/apply/${job.id}`)}
                           className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:shadow-lg transition-shadow"
                         >
                           Apply

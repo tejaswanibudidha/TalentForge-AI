@@ -1,9 +1,19 @@
 import { Router } from 'express';
+import { authenticate, recruiterOnly } from '../middlewares/authMiddleware.js';
+import {
+  createJob,
+  getJobs,
+  getJobById,
+  updateJob,
+  deleteJob,
+} from '../controllers/jobController.js';
+
 const router = Router();
 
-router.get('/', (req, res) => res.json({ message: 'List jobs endpoint placeholder' }));
-router.post('/', (req, res) => res.json({ message: 'Create job endpoint placeholder' }));
-router.put('/:id', (req, res) => res.json({ message: 'Update job endpoint placeholder' }));
-router.delete('/:id', (req, res) => res.json({ message: 'Delete job endpoint placeholder' }));
+router.get('/', getJobs);
+router.get('/:id', getJobById);
+router.post('/', authenticate, recruiterOnly, createJob);
+router.put('/:id', authenticate, recruiterOnly, updateJob);
+router.delete('/:id', authenticate, recruiterOnly, deleteJob);
 
 export default router;

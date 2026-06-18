@@ -22,11 +22,11 @@ export function createOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function sendResetOtp(email, otp, name) {
+export async function sendResetOtp(email, otp, fullName) {
   const subject = 'TalentForge Password Reset OTP';
   const html = `
     <div style="font-family: Arial, sans-serif; line-height:1.6;">
-      <p>Hi ${name || 'user'},</p>
+      <p>Hi ${fullName || 'TalentForge user'},</p>
       <p>Your TalentForge password reset code is:</p>
       <p style="font-size: 24px; font-weight: 700;">${otp}</p>
       <p>This code expires in ${process.env.OTP_EXPIRES_MINUTES || 15} minutes.</p>
@@ -44,11 +44,10 @@ export async function sendResetOtp(email, otp, name) {
 
 export function sanitizeUser(user) {
   if (!user) return null;
-  const name = user.name || user.fullName || '';
+  const fullName = user.fullName || user.name || '';
   return {
     id: user._id?.toString?.(),
-    name,
-    fullName: name,
+    fullName,
     email: user.email,
     role: user.role,
     isVerified: user.isVerified,

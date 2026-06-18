@@ -1,7 +1,17 @@
 import { Router } from 'express';
+import { authenticate } from '../middlewares/authMiddleware.js';
+import {
+  createApplication,
+  getApplications,
+  getApplicationById,
+  updateApplication,
+} from '../controllers/applicationController.js';
+
 const router = Router();
 
-router.get('/', (req, res) => res.json({ message: 'Get applications placeholder' }));
-router.post('/', (req, res) => res.json({ message: 'Apply to job placeholder' }));
+router.get('/', authenticate, getApplications);
+router.get('/:id', authenticate, getApplicationById);
+router.post('/', authenticate, createApplication);
+router.put('/:id', authenticate, updateApplication);
 
 export default router;

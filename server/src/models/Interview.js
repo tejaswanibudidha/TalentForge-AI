@@ -1,13 +1,22 @@
 import mongoose from 'mongoose';
 
-const interviewSchema = new mongoose.Schema({
-  application: { type: mongoose.Schema.Types.ObjectId, ref: 'Application' },
-  scheduledAt: { type: Date },
-  interviewer: { type: String },
-  mode: { type: String, default: 'Video' },
-  notes: { type: String },
-  createdAt: { type: Date, default: Date.now }
-});
+const interviewSchema = new mongoose.Schema(
+  {
+    candidateId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    date: { type: Date, required: true },
+    time: { type: String, required: true, trim: true },
+    meetingLink: { type: String, required: true, trim: true },
+    status: {
+      type: String,
+      enum: ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'],
+      default: 'Scheduled',
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Interview = mongoose.model('Interview', interviewSchema);
 export default Interview;

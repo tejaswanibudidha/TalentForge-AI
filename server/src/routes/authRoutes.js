@@ -15,7 +15,17 @@ const router = Router();
 
 router.post(
   '/register',
-  body('name').trim().notEmpty().withMessage('Name is required.'),
+  body('fullName')
+    .trim()
+    .custom((value, { req }) => {
+      if (value && value.length > 0) {
+        return true;
+      }
+      if (req.body.name && String(req.body.name).trim().length > 0) {
+        return true;
+      }
+      throw new Error('Full name is required.');
+    }),
   body('email').isEmail().withMessage('Valid email is required.'),
   body('password')
     .isLength({ min: 8 })

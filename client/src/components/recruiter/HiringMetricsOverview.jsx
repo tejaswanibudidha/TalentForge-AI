@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -8,70 +8,163 @@ import {
   TrendingUp,
   Target,
 } from "lucide-react";
+import dashboardService from "../../services/dashboardService";
+import { MetricsSkeletonGrid } from "../ui/LoadingSkeleton";
 
 const HiringMetricsOverview = () => {
-  const metrics = [
-    {
-      id: 1,
-      icon: Briefcase,
-      label: "Active Jobs",
-      value: "24",
-      trend: "+3 this month",
-      color: "from-blue-500 to-blue-600",
-      bgColor: "from-blue-100 to-blue-50",
-      trendColor: "text-blue-600",
-    },
-    {
-      id: 2,
-      icon: FileText,
-      label: "Applications",
-      value: "847",
-      trend: "+142 this week",
-      color: "from-purple-500 to-purple-600",
-      bgColor: "from-purple-100 to-purple-50",
-      trendColor: "text-purple-600",
-    },
-    {
-      id: 3,
-      icon: CheckCircle2,
-      label: "Shortlisted",
-      value: "156",
-      trend: "+28 in progress",
-      color: "from-emerald-500 to-emerald-600",
-      bgColor: "from-emerald-100 to-emerald-50",
-      trendColor: "text-emerald-600",
-    },
-    {
-      id: 4,
-      icon: Calendar,
-      label: "Interviews Scheduled",
-      value: "42",
-      trend: "8 this week",
-      color: "from-amber-500 to-amber-600",
-      bgColor: "from-amber-100 to-amber-50",
-      trendColor: "text-amber-600",
-    },
-    {
-      id: 5,
-      icon: TrendingUp,
-      label: "Success Rate",
-      value: "68%",
-      trend: "↑ 12% from last month",
-      color: "from-rose-500 to-rose-600",
-      bgColor: "from-rose-100 to-rose-50",
-      trendColor: "text-rose-600",
-    },
-    {
-      id: 6,
-      icon: Target,
-      label: "Offers Sent",
-      value: "18",
-      trend: "12 accepted",
-      color: "from-indigo-500 to-indigo-600",
-      bgColor: "from-indigo-100 to-indigo-50",
-      trendColor: "text-indigo-600",
-    },
-  ];
+  const [metrics, setMetrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        setLoading(true);
+        const data = await dashboardService.getRecruiterDashboard();
+
+        // Map API data to metrics structure
+        const mappedMetrics = [
+          {
+            id: 1,
+            icon: Briefcase,
+            label: "Active Jobs",
+            value: String(data.totalJobs || 0),
+            trend: `${data.totalJobs || 0} active`,
+            color: "from-blue-500 to-blue-600",
+            bgColor: "from-blue-100 to-blue-50",
+            trendColor: "text-blue-600",
+          },
+          {
+            id: 2,
+            icon: FileText,
+            label: "Applications",
+            value: String(data.totalApplicants || 0),
+            trend: `${data.totalApplicants || 0} received`,
+            color: "from-purple-500 to-purple-600",
+            bgColor: "from-purple-100 to-purple-50",
+            trendColor: "text-purple-600",
+          },
+          {
+            id: 3,
+            icon: CheckCircle2,
+            label: "Shortlisted",
+            value: String(data.shortlisted || 0),
+            trend: `${data.shortlisted || 0} candidates`,
+            color: "from-emerald-500 to-emerald-600",
+            bgColor: "from-emerald-100 to-emerald-50",
+            trendColor: "text-emerald-600",
+          },
+          {
+            id: 4,
+            icon: Calendar,
+            label: "Interviews Scheduled",
+            value: String(data.interviews || 0),
+            trend: `${data.interviews || 0} pending`,
+            color: "from-amber-500 to-amber-600",
+            bgColor: "from-amber-100 to-amber-50",
+            trendColor: "text-amber-600",
+          },
+          {
+            id: 5,
+            icon: TrendingUp,
+            label: "Success Rate",
+            value: data.totalApplicants > 0 ? `${Math.round((data.selected / data.totalApplicants) * 100)}%` : "0%",
+            trend: `${data.selected || 0} offers sent`,
+            color: "from-rose-500 to-rose-600",
+            bgColor: "from-rose-100 to-rose-50",
+            trendColor: "text-rose-600",
+          },
+          {
+            id: 6,
+            icon: Target,
+            label: "Selected Candidates",
+            value: String(data.selected || 0),
+            trend: `${data.selected || 0} hired`,
+            color: "from-indigo-500 to-indigo-600",
+            bgColor: "from-indigo-100 to-indigo-50",
+            trendColor: "text-indigo-600",
+          },
+        ];
+
+        setMetrics(mappedMetrics);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching metrics:", err);
+        setError("Failed to load metrics");
+        // Set default metrics with 0 values on error
+        setMetrics([
+          {
+            id: 1,
+            icon: Briefcase,
+            label: "Active Jobs",
+            value: "0",
+            trend: "0 active",
+            color: "from-blue-500 to-blue-600",
+            bgColor: "from-blue-100 to-blue-50",
+            trendColor: "text-blue-600",
+          },
+          {
+            id: 2,
+            icon: FileText,
+            label: "Applications",
+            value: "0",
+            trend: "0 received",
+            color: "from-purple-500 to-purple-600",
+            bgColor: "from-purple-100 to-purple-50",
+            trendColor: "text-purple-600",
+          },
+          {
+            id: 3,
+            icon: CheckCircle2,
+            label: "Shortlisted",
+            value: "0",
+            trend: "0 candidates",
+            color: "from-emerald-500 to-emerald-600",
+            bgColor: "from-emerald-100 to-emerald-50",
+            trendColor: "text-emerald-600",
+          },
+          {
+            id: 4,
+            icon: Calendar,
+            label: "Interviews Scheduled",
+            value: "0",
+            trend: "0 pending",
+            color: "from-amber-500 to-amber-600",
+            bgColor: "from-amber-100 to-amber-50",
+            trendColor: "text-amber-600",
+          },
+          {
+            id: 5,
+            icon: TrendingUp,
+            label: "Success Rate",
+            value: "0%",
+            trend: "0 offers sent",
+            color: "from-rose-500 to-rose-600",
+            bgColor: "from-rose-100 to-rose-50",
+            trendColor: "text-rose-600",
+          },
+          {
+            id: 6,
+            icon: Target,
+            label: "Selected Candidates",
+            value: "0",
+            trend: "0 hired",
+            color: "from-indigo-500 to-indigo-600",
+            bgColor: "from-indigo-100 to-indigo-50",
+            trendColor: "text-indigo-600",
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetrics();
+  }, []);
+
+  if (loading) {
+    return <MetricsSkeletonGrid />;
+  }
 
   return (
     <motion.div

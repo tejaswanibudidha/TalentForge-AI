@@ -137,16 +137,13 @@ const JobCardProfessional = ({ job, onSave, saved = false }) => {
           </motion.button>
 
           {/* View Job Button */}
-          <Link to={`/jobs/${job.id}`}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-shadow"
-            >
-              Apply Now
-              <ArrowRight size={18} />
-            </motion.button>
-          </Link>
+          <button
+            onClick={() => window.location.assign(`/apply/${job.id}`)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-shadow"
+          >
+            Apply Now
+            <ArrowRight size={18} />
+          </button>
         </div>
       </div>
 
