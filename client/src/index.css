@@ -71,3 +71,19 @@ body {
 .surface-card {
   background: var(--card);
 }
+
+/* Floating blob animations used in hero */
+@keyframes blob {
+  0% { transform: translateY(0px) translateX(0px) scale(1); }
+  33% { transform: translateY(-8px) translateX(6px) scale(1.05); }
+  66% { transform: translateY(6px) translateX(-4px) scale(0.95); }
+  100% { transform: translateY(0px) translateX(0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 6s ease-in-out infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
