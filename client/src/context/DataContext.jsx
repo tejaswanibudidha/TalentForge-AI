@@ -15,14 +15,35 @@ function mapJobResponse(job) {
     salary: job.salary ? String(job.salary) : job.salary || 'TBD',
     experience: job.experience || 'Any',
     openings: job.openings ?? 1,
-    skills: Array.isArray(job.skills) ? job.skills : [],
-    jobType: job.jobType || 'Full-time',
-    status: job.status || 'active',
+    skills: Array.isArray(job.requiredSkills) ? job.requiredSkills : [],
+    jobType: job.employmentType || 'Full-time',
+    status: job.status || 'Open',
     companyId: job.companyId?._id || job.companyId || null,
-    company: job.companyId?.companyName || job.company || 'Unknown',
+    company: job.companyId?.name || job.company || 'Unknown',
     recruiterId: job.recruiterId?._id || job.recruiterId || null,
     createdAt: job.createdAt,
     updatedAt: job.updatedAt,
+    ...job
+  };
+}
+
+function mapCompanyResponse(company) {
+  return {
+    id: company._id,
+    companyId: company.companyId,
+    name: company.name,
+    companyName: company.name,
+    industry: company.industry,
+    description: company.description,
+    website: company.website,
+    hq: company.headquarters,
+    locations: [company.headquarters],
+    logoUrl: company.logoUrl,
+    bannerUrl: company.bannerUrl,
+    benefits: company.benefits || [],
+    hiringRoles: company.hiringRoles || [],
+    recruiterId: company.recruiterId,
+    ...company
   };
 }
 
@@ -33,34 +54,52 @@ export function DataProvider({ children }) {
   const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
-    const loadJobs = async () => {
+    const loadData = async () => {
       try {
-        const res = await api.get('/jobs');
-        const mappedJobs = (res.data?.data?.jobs || []).map(mapJobResponse);
+        // Load jobs from API
+        const jobsRes = await api.get('/jobs');
+        const mappedJobs = (jobsRes.data || []).map(mapJobResponse);
         setJobs(mappedJobs);
       } catch (error) {
         console.error('Failed to load jobs from API:', error?.response?.data || error.message || error);
       }
+
+      try {
+        // Load companies from API
+        const companiesRes = await api.get('/companies');
+        const mappedCompanies = (companiesRes.data || []).map(mapCompanyResponse);
+        setCompanies(mappedCompanies);
+      } catch (error) {
+        console.error('Failed to load companies from API:', error?.response?.data || error.message || error);
+        setCompanies(companyService.getCompanies());
+      }
     };
 
-    loadJobs();
-    setCompanies(companyService.getCompanies());
+    loadData();
     setPosts(postService.getPosts());
     setContacts(contactService.getContacts());
   }, []);
 
   const refresh = () => {
-    setCompanies(companyService.getCompanies());
     setPosts(postService.getPosts());
     setContacts(contactService.getContacts());
 
     api.get('/jobs')
       .then((res) => {
-        const mappedJobs = (res.data?.data?.jobs || []).map(mapJobResponse);
+        const mappedJobs = (res.data || []).map(mapJobResponse);
         setJobs(mappedJobs);
       })
       .catch((error) => {
         console.error('Failed to refresh jobs from API:', error?.response?.data || error.message || error);
+      });
+
+    api.get('/companies')
+      .then((res) => {
+        const mappedCompanies = (res.data || []).map(mapCompanyResponse);
+        setCompanies(mappedCompanies);
+      })
+      .catch((error) => {
+        console.error('Failed to refresh companies from API:', error?.response?.data || error.message || error);
       });
   };
 

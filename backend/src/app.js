@@ -6,6 +6,9 @@ import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import applicationRoutes from './routes/applicationRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -20,6 +23,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/companies', companyRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'TalentForge AI backend' });
