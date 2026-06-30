@@ -230,21 +230,3 @@ const AIRecommendations = () => {
 };
 
 export default AIRecommendations;
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* View All Button */}
-      <motion.button
-        variants={itemVariants}
-        whileHover={{ scale: 1.02 }}
-        className="w-full mt-6 px-6 py-3 rounded-xl border border-indigo-300 text-indigo-600 font-semibold hover:bg-indigo-50 transition"
-      >
-        View All Recommendations →
-      </motion.button>
-    </motion.section>
-  );
-};
-
-export default AIRecommendations;

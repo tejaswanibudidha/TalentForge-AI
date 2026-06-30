@@ -19,7 +19,11 @@ export async function createApplication(req, res, next) {
     let resumeLink = resumeUrl;
     if (req.file && req.file.buffer) {
       try {
-        const uploaded = await uploadBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
+        const uploaded = await uploadBuffer(req.file.buffer, {
+          folder: 'talentforge/resumes',
+          resourceType: 'raw',
+          publicId: `talentforge/resumes/${req.user.id}-${Date.now()}`,
+        });
         resumeLink = uploaded.secure_url || uploaded.url;
         console.log('Uploaded resume to Cloudinary:', resumeLink);
       } catch (uploadErr) {

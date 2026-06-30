@@ -25,14 +25,14 @@ export async function createJob(req, res, next) {
 
     const job = await Job.create({
       title: String(title).trim(),
-      companyId,
+      companyId: companyId || undefined,
       recruiterId: req.user.id,
       location: String(location).trim(),
       salary: salary !== undefined ? Number(salary) : undefined,
       experience: experience ? String(experience).trim() : undefined,
       skills: Array.isArray(skills) ? skills.map((skill) => String(skill).trim()) : [],
       description: String(description).trim(),
-      jobType: String(jobType).trim(),
+      jobType: String(jobType || 'Full-time').trim(),
       openings: openings !== undefined ? Number(openings) : 1,
       status: status ? String(status).trim() : 'active',
     });

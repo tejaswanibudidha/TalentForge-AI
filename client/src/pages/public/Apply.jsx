@@ -77,19 +77,12 @@ export default function Apply() {
     setForm((f) => ({ ...f, [fieldName]: file.name, [`${fieldName}File`]: file }));
   };
 
-  const saveDraft = () => {
-    const drafts = JSON.parse(localStorage.getItem('talentforge_drafts') || '[]');
-    drafts.unshift({ jobId, ...form, savedAt: new Date().toISOString() });
-    localStorage.setItem('talentforge_drafts', JSON.stringify(drafts));
-    alert('Saved as draft');
-  };
-
   const validate = () => {
     if (!form.declaration) return 'Please confirm the declaration';
     if (!form.name || !form.email || !form.phone) return 'Name, email and phone are required';
     // basic email check
     if (!/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(form.email)) return 'Enter a valid email address';
-    if (!form.resumeNameFile && !form.resumeName) return 'Please upload or attach your resume';
+    if (!form.resumeNameFile) return 'Please upload your resume';
     return null;
   };
 
@@ -215,7 +208,6 @@ export default function Apply() {
 
           <div className="flex flex-wrap gap-3">
             <AnimatedButton type="submit">Submit Application</AnimatedButton>
-            <AnimatedButton type="button" variant="ghost" onClick={saveDraft}>Save As Draft</AnimatedButton>
             <AnimatedButton type="button" variant="ghost" onClick={() => navigate(-1)}>Cancel</AnimatedButton>
           </div>
         </form>

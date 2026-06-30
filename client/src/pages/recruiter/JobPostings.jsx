@@ -11,12 +11,13 @@ const defaultForm = {
   salary: '',
   experience: '',
   openings: 1,
-  location: ''
+  location: '',
+  jobType: 'Full-time',
 };
 
 export default function RecruiterJobPostings() {
   const { user } = useAuth();
-  const { jobs, companies, publishJob, refresh } = useData();
+  const { jobs, companies, publishJob, updateJob, deleteJob, refresh } = useData();
   const [form, setForm] = useState(defaultForm);
   const [editing, setEditing] = useState(null);
   const [drafts, setDrafts] = useState([]);
@@ -27,17 +28,29 @@ export default function RecruiterJobPostings() {
 
   const recruiterCompany = companies.find((item) => item.recruiterId === user?.id);
 
-  const saveJob = (event) => {
+  const saveJob = async (event) => {
     event.preventDefault();
     if (!form.title || !form.description) return;
-    publishJob({
+
+    const payload = {
       ...form,
       recruiterId: user.id,
-      companyId: recruiterCompany?.id || null,
-      company: recruiterCompany?.name || user.companyName || 'My Company',
-    });
-    setForm(defaultForm);
-    refresh();
+      companyId: recruiterCompany?.id || undefined,
+      status: 'active',
+    };
+
+    try {
+      if (editing) {
+        await updateJob(editing, payload);
+      } else {
+        await publishJob(payload);
+      }
+      setForm(defaultForm);
+      setEditing(null);
+      refresh();
+    } catch (err) {
+      console.error('Failed to save job:', err?.response?.data || err.message || err);
+    }
   };
 
   const startEdit = (job) => {
@@ -45,18 +58,22 @@ export default function RecruiterJobPostings() {
     setForm({
       title: job.title,
       description: job.description,
-      skills: job.skills,
+      skills: Array.isArray(job.skills) ? job.skills.join(', ') : job.skills,
       salary: job.salary,
       experience: job.experience,
       openings: job.openings,
-      location: job.location
+      location: job.location,
+      jobType: job.jobType || 'Full-time',
     });
   };
 
-  const deleteJob = (jobId) => {
-    const updated = jobs.filter((job) => job.id !== jobId);
-    localStorage.setItem('talentforge_jobs', JSON.stringify(updated));
-    refresh();
+  const handleDelete = async (jobId) => {
+    try {
+      await deleteJob(jobId);
+      refresh();
+    } catch (err) {
+      console.error('Failed to delete job:', err?.response?.data || err.message || err);
+    }
   };
 
   return (
@@ -86,6 +103,15 @@ export default function RecruiterJobPostings() {
             <input value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })} placeholder="Experience" className="rounded-3xl border border-slate-200 px-4 py-3" />
             <input type="number" value={form.openings} onChange={(e) => setForm({ ...form, openings: Number(e.target.value) })} placeholder="Openings" className="rounded-3xl border border-slate-200 px-4 py-3" />
           </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <select value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })} className="rounded-3xl border border-slate-200 px-4 py-3">
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+            <input value={form.openings} onChange={(e) => setForm({ ...form, openings: Number(e.target.value) })} type="number" placeholder="Openings" className="rounded-3xl border border-slate-200 px-4 py-3" />
+          </div>
           <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" rows={4} className="rounded-3xl border border-slate-200 px-4 py-3" />
           <div className="flex justify-end">
             <AnimatedButton type="submit" className="rounded-3xl">Publish Job</AnimatedButton>
@@ -103,7 +129,7 @@ export default function RecruiterJobPostings() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <AnimatedButton variant="ghost" onClick={() => startEdit(job)} className="rounded-full">Edit</AnimatedButton>
-                <AnimatedButton variant="danger" onClick={() => deleteJob(job.id)} className="rounded-full">Delete</AnimatedButton>
+                <AnimatedButton variant="danger" onClick={() => handleDelete(job.id)} className="rounded-full">Delete</AnimatedButton>
               </div>
             </div>
           </AnimatedCard>

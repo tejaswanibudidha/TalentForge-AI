@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
@@ -57,16 +57,15 @@ export default function JobDetails() {
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6">
           <h3 className="text-xl font-semibold text-slate-900">Apply for this role</h3>
-          {applied ? (
-            <p className="mt-4 text-slate-600">Your application has been submitted. Check your dashboard for updates.</p>
-          ) : (
-            <form onSubmit={handleApply} className="space-y-4">
-              <textarea value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} placeholder="Key skills (comma separated)" className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-700" rows={2} />
-              <textarea value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value })} placeholder="Education summary" className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-700" rows={2} />
-              <textarea value={form.resume} onChange={(e) => setForm({ ...form, resume: e.target.value })} placeholder="Paste resume summary" className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-700" rows={3} />
-              <AnimatedButton type="submit" className="w-full rounded-3xl">{user?.role === 'jobseeker' ? 'Submit Application' : 'Sign in as Job Seeker'}</AnimatedButton>
-            </form>
-          )}
+          <p className="mt-4 text-slate-600">Please complete your application with a resume upload and cover letter for the best chance to be considered.</p>
+          <div className="mt-6 grid gap-3">
+            <AnimatedButton type="button" onClick={() => navigate(`/apply/${id}`)} className="w-full rounded-3xl">
+              {user?.role === 'jobseeker' ? 'Continue to Apply' : 'Sign in as Job Seeker'}
+            </AnimatedButton>
+            <AnimatedButton type="button" variant="ghost" onClick={() => navigate(-1)} className="w-full rounded-3xl">
+              Back to listings
+            </AnimatedButton>
+          </div>
         </div>
       </div>
     </div>
