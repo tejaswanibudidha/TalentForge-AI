@@ -9,8 +9,6 @@ import TFFeatures from "./TFFeatures";
 import TFHowItWorks from "./TFHowItWorks";
 import TFPlatformBenefits from "./TFPlatformBenefits";
 import TFStatistics from "./TFStatistics";
-import TFTestimonials from "./TFTestimonials";
-import TFCTA from "./TFCTA";
 import TFFooter from "./TFFooter";
 
 const TalentForgeLandingPage = () => {
@@ -47,12 +45,6 @@ const TalentForgeLandingPage = () => {
 
       {/* Statistics */}
       <TFStatistics />
-
-      {/* Testimonials */}
-      <TFTestimonials />
-
-      {/* CTA Section */}
-      <TFCTA />
 
       {/* Footer */}
       <TFFooter />

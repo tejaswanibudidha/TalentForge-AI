@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -7,69 +7,9 @@ import {
   itemVariants,
   hoverScale,
 } from "../../utils/animations";
-import { ArrowRight, PlayCircle } from "lucide-react";
-import dashboardService from "../../services/dashboardService";
+import { ArrowRight } from "lucide-react";
 
 const TFHeroSection = () => {
-  const [isHovering, setIsHovering] = useState(false);
-  const [summary, setSummary] = useState({
-    atsScore: 0,
-    matchScore: 0,
-    totalCandidates: 0,
-    pipelineCount: 0,
-  });
-  const [topCandidates, setTopCandidates] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchSummary() {
-      try {
-        const data = await dashboardService.getPublicDashboardSummary();
-        setSummary({
-          atsScore: data.atsScore ?? 0,
-          matchScore: data.matchScore ?? 0,
-          totalCandidates: data.totalCandidates ?? 0,
-          pipelineCount: data.pipelineCount ?? 0,
-        });
-        setTopCandidates(data.topCandidates || []);
-      } catch (error) {
-        setSummary({
-          atsScore: 0,
-          matchScore: 0,
-          totalCandidates: 0,
-          pipelineCount: 0,
-        });
-        setTopCandidates([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSummary();
-  }, []);
-
-  const stats = [
-    { label: "ATS Score", value: loading ? "--" : `${summary.atsScore}%`, icon: "⚡" },
-    { label: "Match Score", value: loading ? "--" : `${summary.matchScore}%`, icon: "🎯" },
-    { label: "Candidates", value: loading ? "--" : summary.totalCandidates.toLocaleString(), icon: "👥" },
-    { label: "Pipeline", value: loading ? "--" : summary.pipelineCount.toLocaleString(), icon: "📊" },
-  ];
-
-  const candidates = loading
-    ? [
-        { name: "Loading...", score: 0 },
-        { name: "Loading...", score: 0 },
-        { name: "Loading...", score: 0 },
-      ]
-    : topCandidates.length > 0
-    ? topCandidates.map((candidate) => ({
-        name: candidate.candidateName || 'Candidate',
-        score: candidate.atsScore || candidate.matchScore || 0,
-      }))
-    : [
-        { name: "No candidate data", score: 0 },
-      ];
-
   return (
     <div
       id="home"
@@ -149,144 +89,56 @@ const TFHeroSection = () => {
                   />
                 </Link>
               </motion.div>
-              <motion.button
-                {...hoverScale}
-                className="px-8 py-4 border-2 border-slate-300 text-slate-700 font-semibold rounded-lg hover:border-indigo-600 hover:text-indigo-600 transition-colors flex items-center justify-center gap-2"
-              >
-                <PlayCircle size={18} />
-                Watch Demo
-              </motion.button>
             </motion.div>
           </motion.div>
 
-          {/* Right - Dashboard Preview */}
+          {/* Right - AI Recruitment Illustration */}
           <motion.div
             variants={itemVariants}
             className="relative"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
           >
-            {/* Floating Background Cards */}
+            {/* Background Blobs */}
             <motion.div
               animate={{
-                y: isHovering ? -10 : 0,
+                y: [0, -20, 0],
               }}
-              className="relative w-full aspect-square"
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute inset-0 -z-10"
             >
-              {/* Main Dashboard Card */}
-              <motion.div
-                animate={{
-                  y: [0, -15, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-2xl p-8 border border-slate-200/50"
+              <div className="absolute -top-10 -right-10 w-80 h-80 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full blur-3xl opacity-40"></div>
+              <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-gradient-to-br from-purple-200 to-blue-200 rounded-full blur-3xl opacity-30"></div>
+            </motion.div>
+
+            {/* Main Illustration Image */}
+            <motion.div
+              animate={{
+                y: [0, -15, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-white/40 bg-white"
+            >
+              <img 
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=600&fit=crop" 
+                alt="AI Recruitment and Hiring Technology"
+                className="w-full h-full object-cover"
+              />
+              
+              {/* Floating Info Card */}
+              <motion.div 
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-4 text-white shadow-lg"
               >
-                <div className="space-y-6">
-                  {/* Dashboard Header */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-900">
-                      AI Talent Dashboard
-                    </h3>
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  </div>
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {stats.map((stat, idx) => (
-                      <motion.div
-                        key={idx}
-                        animate={{
-                          scale: isHovering ? 1.05 : 1,
-                        }}
-                        transition={{ duration: 0.2 }}
-                        className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100/50"
-                      >
-                        <div className="text-sm text-slate-600 mb-2">
-                          {stat.label}
-                        </div>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold text-indigo-600">
-                            {stat.value}
-                          </span>
-                          <span className="text-xl">{stat.icon}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Candidates List */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-semibold text-slate-700 mb-3">
-                      Top Candidates
-                    </div>
-                    {candidates.map((candidate, idx) => (
-                      <div
-                        key={`${candidate.name}-${idx}`}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="text-slate-700">{candidate.name}</span>
-                        <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${candidate.score}%` }}
-                            transition={{
-                              duration: 1.2,
-                              ease: "easeOut",
-                              delay: idx * 0.15,
-                            }}
-                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Floating Cards */}
-              <motion.div
-                animate={{
-                  x: [0, -10, 0],
-                  y: [20, 0, 20],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute top-10 -right-8 bg-white rounded-lg shadow-lg p-4 border border-slate-200/50 w-32"
-              >
-                <div className="text-xs font-semibold text-indigo-600 mb-1">
-                  Resume Analysis
-                </div>
-                <div className="text-2xl font-bold text-slate-900">
-                  {loading ? '--' : `${summary.atsScore}%`}
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{
-                  x: [0, 10, 0],
-                  y: [-20, 0, -20],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.5,
-                }}
-                className="absolute bottom-10 -left-8 bg-white rounded-lg shadow-lg p-4 border border-slate-200/50 w-32"
-              >
-                <div className="text-xs font-semibold text-purple-600 mb-1">
-                  Skill Match
-                </div>
-                <div className="text-2xl font-bold text-slate-900">
-                  {loading ? '--' : `${summary.matchScore}%`}
-                </div>
+                <p className="text-xs font-semibold text-indigo-100 uppercase tracking-wider">AI Powered Matching</p>
+                <p className="mt-2 text-2xl font-bold">92% Accuracy</p>
               </motion.div>
             </motion.div>
           </motion.div>

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Company from '../models/Company.js';
 import Job from '../models/Job.js';
@@ -184,6 +185,12 @@ const seedJobs = [
 
 export async function seedDatabase() {
   try {
+    // Check if MongoDB is connected before seeding
+    if (mongoose.connection.readyState !== 1) {
+      console.warn('⚠️  MongoDB not connected. Skipping database seeding.');
+      return;
+    }
+
     // Seed Recruiters (one for each company)
     const hasRecruiterData = await User.countDocuments({ role: 'recruiter' });
     
